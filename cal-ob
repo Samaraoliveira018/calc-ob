@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Banca - Opções Binárias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .input-group input {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: 180px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .summary {
+            padding: 30px;
+            background: white;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .summary-card.success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .summary-card.warning {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .summary-card h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 0.95em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+
+        .currency {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .day-highlight {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .controls {
+                padding: 20px;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .input-group input {
+                width: 100%;
+            }
+            
+            .summary {
+                padding: 20px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 Gerenciamento de Banca</h1>
+            <p>Opções Binárias - Planejamento Dinâmico</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <div class="input-group">
+                    <label for="bancaInicial">💰 Banca Inicial (R$)</label>
+                    <input type="number" id="bancaInicial" value="400" min="1" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label for="metaPercentual">🎯 Meta Diária (%)</label>
+                    <input type="number" id="metaPercentual" value="5" min="0.1" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="payoutPercentual">💹 Payout (%)</label>
+                    <input type="number" id="payoutPercentual" value="88" min="50" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="diasPlanejamento">📅 Dias de Planejamento</label>
+                    <input type="number" id="diasPlanejamento" value="30" min="1" max="365" step="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Banca Final Estimada</h3>
+                    <div class="value" id="bancaFinal">R$ 1.728,78</div>
+                </div>
+                <div class="summary-card success">
+                    <h3>Lucro Total Projetado</h3>
+                    <div class="value" id="lucroTotal">R$ 1.328,78</div>
+                </div>
+                <div class="summary-card warning">
+                    <h3>Percentual de Crescimento</h3>
+                    <div class="value" id="crescimentoPercentual">332%</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="tabelaPlanejamento">
+                    <thead>
+                        <tr>
+                            <th>📅 Dia</th>
+                            <th>💰 Banca Inicial (R$)</th>
+                            <th>🎯 Meta Diária (R$)</th>
+                            <th>💵 Lucro por Operação (R$)</th>
+                            <th>📊 Entrada por Operação (R$)</th>
+                            <th>📈 Nova Banca Estimada (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <button class="export-btn" onclick="exportarParaExcel()">
+                📥 Exportar para Excel
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let dados = [];
+
+        function calcularPlanejamento() {
+            const bancaInicial = parseFloat(document.getElementById('bancaInicial').value) || 400;
+            const metaPercentual = parseFloat(document.getElementById('metaPercentual').value) || 5;
+            const payoutPercentual = parseFloat(document.getElementById('payoutPercentual').value) || 88;
+            const diasPlanejamento = parseInt(document.getElementById('diasPlanejamento').value) || 30;
+
+            dados = [];
+            let bancaAtual = bancaInicial;
+
+            for (let dia = 1; dia <= diasPlanejamento; dia++) {
+                const metaDiaria = bancaAtual * (metaPercentual / 100);
+                const lucroPorOperacao = metaDiaria / 2; // Assumindo 2 operações por dia
+                
+                // Cálculo da entrada necessária baseado no payout
+                // Se payout é 88%, para lucrar X, preciso apostar X / (88/100)
+                const entradaPorOperacao = lucroPorOperacao / (payoutPercentual / 100);
+                
+                const novaBanca = bancaAtual + metaDiaria;
+
+                dados.push({
+                    dia: dia,
+                    bancaInicial: bancaAtual,
+                    metaDiaria: metaDiaria,
+                    lucroPorOperacao: lucroPorOperacao,
+                    entradaPorOperacao: entradaPorOperacao,
+                    novaBanca: novaBanca
+                });
+
+                bancaAtual = novaBanca;
+            }
+
+            atualizarTabela();
+            atualizarResumo();
+        }
+
+        function atualizarTabela() {
+            const tbody = document.getElementById('tabelaBody');
+            tbody.innerHTML = '';
+
+            dados.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                if (index % 7 === 6) { // Destacar finais de semana (a cada 7 dias)
+                    tr.className = 'day-highlight';
+                }
+
+                tr.innerHTML = `
+                    <td><strong>${item.dia}</strong></td>
+                    <td class="currency">R$ ${item.bancaInicial.toFixed(2)}</td>
+                    <td class="currency">R$ ${item.metaDiaria.toFixed(2)}</td>
+                    <td class="currency">R$ ${item.lucroPorOperacao.toFixed(2)}</td>
+                    <td class="currency">R$ ${item.entradaPorOperacao.toFixed(2)}</td>
+                    <td class="currency">R$ ${item.novaBanca.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function atualizarResumo() {
+            if (dados.length === 0) return;
+
+            const bancaInicial = dados[0].bancaInicial;
+            const bancaFinal = dados[dados.length - 1].novaBanca;
+            const lucroTotal = bancaFinal - bancaInicial;
+            const crescimentoPercentual = ((bancaFinal - bancaInicial) / bancaInicial) * 100;
+
+            document.getElementById('bancaFinal').textContent = `R$ ${bancaFinal.toFixed(2)}`;
+            document.getElementById('lucroTotal').textContent = `R$ ${lucroTotal.toFixed(2)}`;
+            document.getElementById('crescimentoPercentual').textContent = `${crescimentoPercentual.toFixed(1)}%`;
+        }
+
+        function exportarParaExcel() {
+            const wb = XLSX.utils.book_new();
+            
+            // Preparar dados para exportação
+            const dadosExport = [
+                ['Dia', 'Banca Inicial (R$)', 'Meta Diária (R$)', 'Lucro por Operação (R$)', 'Entrada por Operação (R$)', 'Nova Banca Estimada (R$)']
+            ];
+
+            dados.forEach(item => {
+                dadosExport.push([
+                    item.dia,
+                    item.bancaInicial,
+                    item.metaDiaria,
+                    item.lucroPorOperacao,
+                    item.entradaPorOperacao,
+                    item.novaBanca
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(dadosExport);
+            
+            // Aplicar formatação
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let row = 1; row <= range.e.r; row++) {
+                for (let col = 1; col <= range.e.c; col++) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+                    if (ws[cellAddress]) {
+                        ws[cellAddress].z = '#,##0.00';
+                    }
+                }
+            }
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Planejamento');
+            
+            const bancaInicial = document.getElementById('bancaInicial').value;
+            const filename = `Planejamento_Banca_${bancaInicial}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            
+            XLSX.writeFile(wb, filename);
+        }
+
+        // Event listeners
+        document.getElementById('bancaInicial').addEventListener('input', calcularPlanejamento);
+        document.getElementById('metaPercentual').addEventListener('input', calcularPlanejamento);
+        document.getElementById('payoutPercentual').addEventListener('input', calcularPlanejamento);
+        document.getElementById('diasPlanejamento').addEventListener('input', calcularPlanejamento);
+
+        // Inicializar
+        calcularPlanejamento();
+    </script>
+</body>
+</html>
